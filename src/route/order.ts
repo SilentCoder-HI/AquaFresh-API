@@ -5,7 +5,6 @@ import mongoose from "mongoose";
 const ordersRouter = Router();
 
 const validID = (req: Request, res: Response, next: NextFunction) => {
-    console.log(req.params)
     if (!mongoose.isValidObjectId(req.params.id)) {
         res.status(400).json({ error: "Invalid Id" });
         return;
