@@ -16,7 +16,7 @@ if (!uri) {
 
 app.use(cors())
 app.use(express.json())
-app.use("/order",ordersRouter)
+app.use("/orders",ordersRouter)
 
 
 app.get('/', (req: Request, res: Response) => res.json({ status: "AquaFresh API running" }))
