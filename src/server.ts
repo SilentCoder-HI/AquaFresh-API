@@ -3,7 +3,7 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import { Response, Request } from "express"
-// import ordersRouter from "./routes/orders.js";
+import ordersRouter from "./route/order";
 
 
 const app = express()
@@ -16,9 +16,10 @@ if (!uri) {
 
 app.use(cors())
 app.use(express.json())
+app.use("/order",ordersRouter)
 
 
-app.get('/', (res: Response, req: Request) => res.json({ status: "AquaFresh API running" }))
+app.get('/', (req: Request, res: Response) => res.json({ status: "AquaFresh API running" }))
 
 
 mongoose.connect(uri).then(()=>app.listen(PORT,()=> console.log(`API on http://localhost:${PORT}`)))

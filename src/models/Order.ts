@@ -1,16 +1,15 @@
-import mongoose from "mongoose";
+import mongoose, { Schema, InferSchemaType } from "mongoose";
 
-const orderScheme = new mongoose.Schema({
+export const STATUSES = ["Pending", "In-Transit", "Delivered"] as const;
+
+const orderSchema = new Schema(
+  {
     customer: { type: String, required: true, trim: true },
     packageSize: { type: String, required: true, trim: true },
-    status: {
-        type: String,
-        enum: ["Pending", "In-Transit", "Delivered"],
-        default: "Pending",
-    },
-},
-{
-    timestamps: { createdAt: true, updatedAt: false }
-})
+    status: { type: String, enum: STATUSES, default: "Pending" },
+  },
+  { timestamps: { createdAt: true, updatedAt: false } }
+);
 
-export default mongoose.model("Order",orderScheme)
+export type OrderType = InferSchemaType<typeof orderSchema>;
+export default mongoose.model("Order", orderSchema);
