@@ -1,128 +1,166 @@
-# AquaFresh Order API
+# AquaFresh Backend API
 
-REST API for AquaFresh Water Delivery. Staff use it to create, view, update and delete bottled-water delivery orders. This is **Task 2** of the AquaFresh Order Board project. The React front end (Task 1) will be connected to this API in Task 3.
+This backend provides the REST API for the AquaFresh water-delivery application. It manages delivery orders and stores them in MongoDB, with Express handling all CRUD operations.
+
+## Overview
+
+The API is designed for the AquaFresh dashboard and supports creating, retrieving, updating, and deleting orders. It validates MongoDB ObjectId values and enforces the allowed order statuses.
+
+## Features
+
+- Order CRUD endpoints
+- MongoDB integration with Mongoose
+- Status validation for Pending, In-Transit, and Delivered
+- Automatic createdAt timestamps
+- CORS enabled for frontend access
+- Error handling for invalid IDs and missing records
 
 ## Tech stack
 
 - Node.js
-- Express
-- MongoDB Atlas with Mongoose
-- CORS and dotenv
+- Express 5
+- TypeScript
+- Mongoose
+- MongoDB
+- dotenv
+- CORS
 
-## Getting started
+## Local setup
 
-### Requirements
+### Prerequisites
 
-- Node.js 18 or newer and npm
-- A free MongoDB Atlas cluster (or a local MongoDB)
+- Node.js 18+
+- npm
+- MongoDB Atlas connection string or a local MongoDB instance
 
 ### Install and run
 
 ```bash
+cd backend
 npm install
+```
+
+Create a `.env` file in the backend folder:
+
+```env
+PORT=5000
+MONGO_URI=mongodb://localhost:27017/aquafresh
+```
+
+Then start the server:
+
+```bash
 npm run dev
 ```
 
-The API runs at `http://localhost:5000`.
+The API will run at:
 
-### Environment variables
-
-Create a `.env` file in the project root (see `.env.example`):
-
-```
-PORT=5000
-MONGO_URI=your_mongodb_connection_string
+```text
+http://localhost:5000
 ```
 
-Never commit your real `.env` file.
+## Available scripts
 
-## Order schema
-
-| Field | Type | Notes |
-| --- | --- | --- |
-| `customer` | String | Required |
-| `packageSize` | String | Required |
-| `status` | String | `Pending` (default), `In-Transit` or `Delivered` |
-| `createdAt` | Date | Set automatically |
+```bash
+npm run dev   # run the server with tsx watch
+npm run build  # compile TypeScript
+npm start     # run the compiled production build
+```
 
 ## API endpoints
 
-| Method | Route | Description | Success | Errors |
-| --- | --- | --- | --- | --- |
-| GET | `/orders` | Get all orders | 200 | |
-| POST | `/orders` | Create an order | 201 | 400 |
-| PATCH | `/orders/:id` | Update an order's status | 200 | 400, 404 |
-| DELETE | `/orders/:id` | Delete an order | 200 | 400, 404 |
+### Get all orders
 
-Error responses are JSON, for example `{"error":"Order not found"}`.
-
-## Testing with curl
-
-**Get all orders**
-```bash
-curl http://localhost:5000/orders
+```http
+GET /orders
 ```
 
-**Create an order**
-```bash
-curl -X POST http://localhost:5000/orders \
-  -H "Content-Type: application/json" \
-  -d '{"customer":"Ali Khan","packageSize":"19L Bottle x 2"}'
+### Create an order
+
+```http
+POST /orders
+Content-Type: application/json
 ```
 
-**Update an order's status**
-```bash
-curl -X PATCH http://localhost:5000/orders/<id> \
-  -H "Content-Type: application/json" \
-  -d '{"status":"In-Transit"}'
-```
-
-**Delete an order**
-```bash
-curl -X DELETE http://localhost:5000/orders/<id>
-```
-
-Replace `<id>` with the `_id` from the create or get-all response.
-
-### Example response (POST)
+Request body:
 
 ```json
 {
-  "_id": "6af3053b17a94dc2f91f244b",
   "customer": "Ali Khan",
   "packageSize": "19L Bottle x 2",
-  "status": "Pending",
-  "createdAt": "2026-11-10T11:51:23.619Z"
+  "status": "Pending"
 }
 ```
 
-### Tested status codes
+### Update an order status
 
-| Test | Result |
-| --- | --- |
-| POST with valid data | 201 |
-| GET all orders | 200 |
-| PATCH an existing order | 200 |
-| DELETE an existing order | 200 |
-| DELETE the same order again | 404 |
-| DELETE with an invalid id | 400 |
+```http
+PATCH /orders/:id
+Content-Type: application/json
+```
+
+Example:
+
+```json
+{
+  "status": "In-Transit"
+}
+```
+
+### Delete an order
+
+```http
+DELETE /orders/:id
+```
+
+## Order schema
+
+```ts
+export const STATUSES = ["Pending", "In-Transit", "Delivered"] as const;
+
+const orderSchema = new Schema(
+  {
+    customer: { type: String, required: true, trim: true },
+    packageSize: { type: String, required: true, trim: true },
+    status: { type: String, enum: STATUSES, default: "Pending" },
+  },
+  { timestamps: { createdAt: true, updatedAt: false } }
+);
+```
 
 ## Project structure
 
-Adjust this to match your folders:
-
+```text
+backend/
+├── src/
+│   ├── models/
+│   │   └── Order.ts
+│   ├── route/
+│   │   └── order.ts
+│   └── server.ts
+├── package.json
+├── tsconfig.json
+├── readme.md
+└── .env
 ```
-src/
-  models/Order     # Mongoose schema
-  routes/orders    # CRUD routes
-  server           # Express app and database connection
+
+## Sample response
+
+```json
+{
+  "_id": "67d7d5f7d13b4d4e6f11aa23",
+  "customer": "Ali Khan",
+  "packageSize": "19L Bottle x 2",
+  "status": "Pending",
+  "createdAt": "2026-11-11T10:12:30.000Z"
+}
 ```
 
-## What is not included yet
+## Notes
 
-- Front-end connection and moving cards between columns (Task 3)
-- Deployment (Task 3)
-- Authentication and automated tests
+- The API validates all incoming IDs before update or delete actions.
+- Missing or invalid MongoDB configuration will prevent the server from starting.
+- This backend is intended to support the frontend order board and can be connected to the React app through the API endpoints.
 
 ## Author
 
