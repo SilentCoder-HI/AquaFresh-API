@@ -25,6 +25,19 @@ The API is designed for the AquaFresh dashboard and supports creating, retrievin
 - dotenv
 - CORS
 
+## Public deployment
+
+- Frontend: [https://aquafresh-nine.vercel.app/](https://aquafresh-nine.vercel.app/)
+- Backend API: [https://aqua-fresh-api.vercel.app/](https://aqua-fresh-api.vercel.app/)
+
+Both applications are deployed on Vercel from this repository as separate projects:
+
+1. Import the repository into Vercel and set the project root directory to `backend`.
+2. Add the `MONGO_URI` environment variable with the production MongoDB connection string. Set `CLIENT_URL` to `https://aquafresh-nine.vercel.app` to allow the deployed frontend through CORS.
+3. Deploy the backend. Vercel serves the API through `api/index.ts`; verify the deployment by opening the backend URL, which should return an API status response.
+4. Create a second Vercel project from the same repository with the root directory set to `frontend` and the framework preset set to Vite.
+5. Add `VITE_API_URL` with the value `https://aqua-fresh-api.vercel.app` and deploy the frontend. Redeploy after changing environment variables so the frontend build uses the updated API URL.
+
 ## Local setup
 
 ### Prerequisites
