@@ -35,7 +35,7 @@ ordersRouter.patch("/:id", validID, async (req: Request, res: Response, next: Ne
         const order = await Order.findByIdAndUpdate(
             req.params.id,
             { status: req.body.status },
-            { new: true, runValidators: true }
+            { returnDocument: "after", runValidators: true }
         );
         if (!order) {
             res.status(404).json({ error: "Order not found" });
